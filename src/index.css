@@ -127,7 +127,9 @@ div[id] {
     opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.js .reveal-in {
+/* Must be at least as specific as `.js .reveal`, otherwise the initial
+ * hidden state wins and revealed content never fades in. */
+.js .reveal.reveal-in {
   opacity: 1;
   transform: none;
 }
@@ -141,7 +143,8 @@ div[id] {
   html {
     scroll-behavior: auto;
   }
-  .js .reveal {
+  .js .reveal,
+  .js .reveal.reveal-in {
     opacity: 1;
     transform: none;
     transition: none;
