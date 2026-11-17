@@ -119,7 +119,7 @@ export default function Catalog() {
           eyebrow="The catalog"
           title={
             <>
-              15 accessories. <span className="text-ink/35">No filler.</span>
+              {products.length} accessories. <span className="text-ink/35">No filler.</span>
             </>
           }
           desc="We only stock what survives a season of real use — every item rated, spec'd, and returnable for 30 days if it doesn't fit your machine."

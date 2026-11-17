@@ -4,6 +4,7 @@ import type { Product } from "@/data/products";
 import { categoryName } from "@/data/products";
 import { useCart } from "@/store/cart";
 import { Stars, money, Pill } from "@/components/ui";
+import { ProductImage } from "@/components/ProductImage";
 import { cn } from "@/utils/cn";
 
 export function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
@@ -26,13 +27,15 @@ export function ProductCard({ product, priority }: { product: Product; priority?
       id={`product-${product.id}`}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-ink/8 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-ink/15 hover:shadow-[0_22px_50px_-26px_rgba(14,17,19,0.45)]"
     >
-      <a href={`#pdp-${product.id}`} className="relative block overflow-hidden bg-[#efede7]">
-        <img
-          src={product.image}
-          alt={`${product.name} — ${product.tagline}`}
-          loading={priority ? "eager" : "lazy"}
-          className="aspect-square w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
-        />
+      <a href={`#pdp-${product.id}`} className="relative block aspect-square overflow-hidden bg-[#efede7]">
+        <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.045]">
+          <ProductImage
+            image={product.image}
+            gallery={product.gallery}
+            alt={`${product.name} — ${product.tagline}`}
+            eager={priority}
+          />
+        </div>
         <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
           {off > 0 && <Pill tone="sale">–{off}%</Pill>}
           {product.badges?.slice(0, 1).map((b) => (

@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: "Do I need a gas machine for the surface cleaners?",
-    a: "No — the Rotary 15 is rated from 2,000 PSI, which most 13-amp electric machines reach. It's slower at lower pressure but still saves you hours of wanding. The Monsoon 20 Pro is genuinely gas-oriented: below 2,800 PSI it will underwhelm.",
+    a: "No — the Rotary 15 is rated from 2,000 PSI, which most 13-amp electric machines reach. It's slower at lower pressure but still saves you hours of wanding. The Concrete Kit's turbo nozzle wants at least 1,500 PSI; below that it just spins.",
   },
   {
     q: "Is the foam cannon safe on car paint?",

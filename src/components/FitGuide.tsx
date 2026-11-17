@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowRight, Check, CircleHelp, Gauge, RotateCcw } from "lucide-react";
 import { products } from "@/data/products";
 import { SectionHead, Reveal } from "@/components/ui";
+import { ProductImage } from "@/components/ProductImage";
 import { cn } from "@/utils/cn";
 
 /**
@@ -30,20 +31,16 @@ const jobs: { id: Job; label: string }[] = [
 // Minimum PSI a given product realistically needs to do its job.
 const minPsi: Record<string, number> = {
   "rotary-15": 2000,
-  "monsoon-20": 2800,
   "foam-cannon": 1200,
-  "foam-2l-detail": 1200,
   "turbo-nozzle": 1500,
   "nozzle-tips-5": 1000,
   "telescoping-18": 2000,
   "extension-wand-2pc": 1000,
   "undercarriage-cleaner": 1400,
   "gutter-cleaner": 1600,
-  "hose-50": 1000,
   "qc-kit": 1000,
-  "pump-guard": 1000,
   "starter-kit": 2000,
-  "driveway-kit": 2800,
+  "driveway-kit": 2000,
 };
 
 export default function FitGuide() {
@@ -54,10 +51,10 @@ export default function FitGuide() {
 
   const picks = useMemo(() => {
     const jobMatch: Record<Job, string[]> = {
-      driveway: ["rotary-15", "monsoon-20", "turbo-nozzle", "driveway-kit", "starter-kit", "pump-guard"],
+      driveway: ["rotary-15", "turbo-nozzle", "driveway-kit", "starter-kit", "nozzle-tips-5"],
       siding: ["telescoping-18", "extension-wand-2pc", "nozzle-tips-5", "gutter-cleaner", "foam-cannon"],
-      vehicles: ["foam-cannon", "foam-2l-detail", "undercarriage-cleaner", "nozzle-tips-5", "hose-50"],
-      everything: ["rotary-15", "nozzle-tips-5", "foam-cannon", "telescoping-18", "hose-50", "qc-kit"],
+      vehicles: ["foam-cannon", "undercarriage-cleaner", "nozzle-tips-5", "extension-wand-2pc"],
+      everything: ["rotary-15", "nozzle-tips-5", "foam-cannon", "telescoping-18", "qc-kit", "starter-kit"],
     };
     return jobMatch[job]
       .map((id) => products.find((p) => p.id === id)!)
@@ -167,7 +164,9 @@ export default function FitGuide() {
                           : "border-white/[0.06] bg-transparent opacity-60",
                       )}
                     >
-                      <img src={p.image} alt="" className="h-11 w-11 rounded-lg object-cover" />
+                      <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg">
+                        <ProductImage image={p.image} gallery={p.gallery} alt="" />
+                      </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[13px] font-bold">{p.name}</span>
                         <span className="flex items-center gap-1 truncate text-[11px] text-paper/45">

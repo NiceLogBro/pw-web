@@ -13,6 +13,7 @@ import {
 import { byId, categoryName, fitsLabel, products } from "@/data/products";
 import { useCart } from "@/store/cart";
 import { Stars, money, Pill } from "@/components/ui";
+import { ProductImage } from "@/components/ProductImage";
 import { cn } from "@/utils/cn";
 
 /** Reads the current `#pdp-<id>` hash, if any. */
@@ -96,10 +97,12 @@ export default function ProductModal() {
           <div className="grid sm:grid-cols-2">
             {/* image side */}
             <div className="relative bg-[#efede7]">
-              <img
-                src={p.image}
+              <ProductImage
+                image={p.image}
+                gallery={p.gallery}
                 alt={`${p.name} — ${p.tagline}`}
-                className="h-64 w-full object-cover sm:h-full"
+                className="h-64 sm:h-full sm:min-h-[420px]"
+                eager
               />
               <div className="absolute left-4 top-4 flex flex-col items-start gap-1.5">
                 {off > 0 && <Pill tone="sale">Save {money(off)}</Pill>}

@@ -25,8 +25,8 @@ const reviews = [
     where: "Tampa, FL",
     rating: 4,
     title: "Great deck, needed the QC kit",
-    body: "The 20-inch deck is a beast on my paver patio. My machine had an M22 fitting so I needed the adapter set — wish that was clearer up front, but the support chat answered in about two minutes.",
-    product: "Monsoon 20 Pro + Brass QC Kit",
+    body: "The deck is a beast on my paver patio — did half of it before I stopped for water. My machine had an M22 fitting so I needed the adapter set; wish that was clearer up front, but the support chat answered in about two minutes.",
+    product: "Rotary 15 + Brass QC Kit",
     verified: true,
   },
   {

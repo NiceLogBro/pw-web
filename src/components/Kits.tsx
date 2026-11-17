@@ -2,6 +2,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { byId } from "@/data/products";
 import { useCart } from "@/store/cart";
 import { money, Reveal, SectionHead, Pill } from "@/components/ui";
+import { ProductImage } from "@/components/ProductImage";
 
 const kits = [
   {
@@ -12,9 +13,9 @@ const kits = [
   },
   {
     id: "driveway-kit",
-    eyebrow: "For a driveway that's given up",
-    includes: ["Monsoon 20 pro deck", "Cyclone turbo nozzle", "Pump Guard concentrate"],
-    note: "Everything for a full spring restore, including the chemistry that protects the pump.",
+    eyebrow: "For concrete that's given up",
+    includes: ["Rotary 15 surface cleaner", "Cyclone turbo nozzle", "Reach 2-Piece Wand"],
+    note: "The flatwork package: the deck for the bulk of it, the turbo for the stains it can't touch.",
   },
 ];
 
@@ -42,17 +43,18 @@ export default function Kits() {
           {kits.map((kit, idx) => {
             const p = byId(kit.id);
             const saving = (p.compareAt ?? p.price) - p.price;
-            const heroProduct = byId(kit.id === "starter-kit" ? "rotary-15" : "monsoon-20");
 
             return (
               <Reveal key={kit.id} delay={idx * 90}>
                 <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-ink/10 bg-white sm:flex-row">
                   <div className="relative w-full shrink-0 overflow-hidden bg-[#f2f0ea] sm:w-[44%]">
-                    <img
-                      src={heroProduct.image}
-                      alt=""
-                      className="h-52 w-full object-cover transition-transform duration-700 group-hover:scale-[1.04] sm:h-full"
-                    />
+                    <div className="h-52 transition-transform duration-700 group-hover:scale-[1.04] sm:h-full">
+                      <ProductImage
+                        image={p.image}
+                        gallery={p.gallery}
+                        alt={`${p.name} contents`}
+                      />
+                    </div>
                     <div className="absolute left-3 top-3">
                       <Pill tone="sale">Save {money(saving)}</Pill>
                     </div>
