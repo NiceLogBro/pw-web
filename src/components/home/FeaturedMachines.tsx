@@ -27,7 +27,7 @@ export default function FeaturedMachines() {
           {machines.slice(0, 3).map((m, i) => (
             <Reveal key={m.slug} delay={i * 90}>
               <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-bone transition-all duration-300 hover:border-ink/25 hover:shadow-[0_30px_60px_-40px_rgba(11,26,34,0.45)]">
-                <Link to={`/product/${m.slug}`} className="relative block overflow-hidden bg-[#eef1f4]">
+                <Link to={`/product/${m.slug}`} className="relative block overflow-hidden bg-[#ecebe7]">
                   <img
                     src={m.image}
                     alt={m.name}

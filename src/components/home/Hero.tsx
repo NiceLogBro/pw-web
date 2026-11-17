@@ -109,7 +109,7 @@ export default function Hero() {
               </span>
             </div>
 
-            <div className="relative aspect-[4/3.35] bg-[#eef1f4]">
+            <div className="relative aspect-[4/3.35] bg-[#ecebe7]">
               <img
                 src="/products/electric-washer.jpg"
                 alt="Tidal 1800 electric pressure washer"

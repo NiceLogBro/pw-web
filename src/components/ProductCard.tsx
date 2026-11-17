@@ -18,7 +18,7 @@ export default function ProductCard({ product, compact = false }: { product: Pro
         "hover:-translate-y-0.5 hover:border-ink/20 hover:shadow-[0_24px_48px_-32px_rgba(11,26,34,0.5)]",
       )}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#eef1f4]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#ecebe7]">
         <Link to={`/product/${product.slug}`} className="block h-full w-full" aria-label={product.name}>
           <img
             src={product.image}

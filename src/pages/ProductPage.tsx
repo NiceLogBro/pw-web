@@ -98,7 +98,7 @@ export default function ProductPage() {
         <div className="mt-5 grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
           {/* Gallery */}
           <div>
-            <div className="relative overflow-hidden rounded-2xl border border-line bg-[#eef1f4]">
+            <div className="relative overflow-hidden rounded-2xl border border-line bg-[#ecebe7]">
               <img
                 key={gallery[activeImage]}
                 src={gallery[activeImage]}
