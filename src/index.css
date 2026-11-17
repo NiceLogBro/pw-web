@@ -1,0 +1,155 @@
+@import "tailwindcss";
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource-variable/inter/index.css";
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Archivo Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* Palette: wet concrete, deep water, and safety-orange gear */
+  --color-ink: #0e1113;
+  --color-graphite: #171c1f;
+  --color-slate-deep: #232a2e;
+  --color-concrete: #eceae4;
+  --color-paper: #f7f5f0;
+  --color-hose: #2f3a3f;
+  --color-wash: #2f7dff;
+  --color-wash-soft: #e6efff;
+  --color-safety: #ff6a1f;
+  --color-safety-deep: #e4550b;
+  --color-spray: #7ff0d4;
+  --color-sale: #d92d20;
+
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-spin-slow: spin 18s linear infinite;
+  --animate-mist: mist 7s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes mist {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(-10px) scale(1.04);
+  }
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes veil-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-gutter: stable;
+}
+
+body {
+  @apply bg-paper font-sans text-ink antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-safety);
+  color: #fff;
+}
+
+/* Slightly condensed, tightly tracked display type — equipment-catalog energy */
+.font-display {
+  font-stretch: 92%;
+  letter-spacing: -0.015em;
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility drawer-panel {
+  animation: drawer-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility veil {
+  animation: veil-in 0.25s ease-out both;
+}
+
+/* Section anchors clear the sticky header */
+section[id],
+div[id] {
+  scroll-margin-top: 6.5rem;
+}
+
+/*
+ * Scroll reveal.
+ * Opt in with `.js .reveal` so the content is visible when scripting or
+ * IntersectionObserver is unavailable — animated content must never be the
+ * only thing keeping a section on screen.
+ */
+.reveal {
+  opacity: 1;
+}
+.js .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.js .reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-wash);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
