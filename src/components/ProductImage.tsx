@@ -24,7 +24,10 @@ export function ProductImage({
       <img
         src={image}
         alt={alt}
+        width={900}
+        height={900}
         loading={eager ? "eager" : "lazy"}
+        decoding="async"
         className={cn("h-full w-full object-cover", imgClassName)}
       />
     );

@@ -1,7 +1,49 @@
-import { ArrowRight, Check, Star, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Check, Copy, Star, Tag, Truck } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { byId } from "@/data/products";
 import { CountUp, Reveal } from "@/components/ui";
+
+/** Real, working promo code — click to copy, then it applies in the drawer. */
+function OfferStrip() {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = setTimeout(() => setCopied(false), 1800);
+    return () => clearTimeout(t);
+  }, [copied]);
+
+  return (
+    <div className="border-y border-ink/10 bg-ink text-paper">
+      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-3.5 sm:flex-row sm:px-6 lg:px-8">
+        <p className="flex items-center gap-2 text-[12.5px]">
+          <Tag className="h-4 w-4 text-spray" />
+          <span className="font-semibold">First order? Take 10% off.</span>
+          <button
+            onClick={() => {
+              navigator.clipboard?.writeText("BLAST10").catch(() => {});
+              setCopied(true);
+            }}
+            className="ml-1 inline-flex items-center gap-1.5 rounded-full border border-dashed border-spray/50 bg-spray/10 px-3 py-1 text-[11.5px] font-bold tracking-[0.08em] text-spray transition-colors hover:bg-spray/15"
+          >
+            {copied ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <Copy className="h-3.5 w-3.5" />}
+            BLAST10
+          </button>
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] font-semibold uppercase tracking-[0.13em] text-paper/45">
+          <span className="flex items-center gap-1.5">
+            <Truck className="h-3.5 w-3.5 text-paper/35" /> Free over $59
+          </span>
+          <span className="text-paper/15" aria-hidden>•</span>
+          <span>Same-day dispatch</span>
+          <span className="text-paper/15" aria-hidden>•</span>
+          <span>30-day returns</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const proof = [
   "Fits any standard 1/4″ quick-connect",
@@ -165,18 +207,8 @@ export default function Hero() {
         </Reveal>
       </div>
 
-      {/* trust bar */}
-      <div className="border-y border-ink/10 bg-white/50">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-4 py-4 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-ink/45 sm:justify-between sm:px-6 lg:px-8">
-          <span>Free shipping over $59</span>
-          <span className="text-ink/15" aria-hidden>•</span>
-          <span>Same-day dispatch before 2pm ET</span>
-          <span className="text-ink/15" aria-hidden>•</span>
-          <span>30-day no-questions returns</span>
-          <span className="text-ink/15" aria-hidden>•</span>
-          <span>Real humans in Savannah, GA</span>
-        </div>
-      </div>
+      {/* offer strip */}
+      <OfferStrip />
     </section>
   );
 }

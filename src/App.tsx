@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Trust from "@/components/Trust";
+import StartHere from "@/components/StartHere";
 import Catalog from "@/components/Catalog";
 import FitGuide from "@/components/FitGuide";
 import Compare from "@/components/Compare";
@@ -23,6 +24,7 @@ export default function App() {
         <main>
           <Hero />
           <Trust />
+          <StartHere />
           <Catalog />
           <FitGuide />
           <Compare />

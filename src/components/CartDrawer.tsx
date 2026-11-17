@@ -419,7 +419,7 @@ export default function CartDrawer() {
 
         {/* ---------------- DONE ---------------- */}
         {step === "done" && (
-          <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center overflow-y-auto px-8 py-10 text-center">
             <div className="grid h-16 w-16 place-items-center rounded-full bg-lagoon/12">
               <CheckCircle2 className="h-8 w-8 text-lagoon" />
             </div>
