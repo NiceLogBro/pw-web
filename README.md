@@ -95,24 +95,58 @@ property-type filter. Two data paths, in this order:
 
 ### About LoopLink
 
-LoopLink is a hosted, paid widget from CoStar/LoopNet. **It is not an API**:
-there is no public LoopNet/CoStar API, no developer portal, and no webhooks, and
-CoStar's terms of service prohibit automated or programmatic access (which it has
-actively litigated). So there is nothing to `npm install` and nothing to scrape.
+LoopLink is a hosted, paid search widget from CoStar/LoopNet — **not an API**.
+There is no public LoopNet/CoStar API, no developer portal, and their terms
+prohibit automated access, so there is nothing to `npm install` and nothing to
+scrape. Access means CoStar provisions a host for you, e.g.
+`https://yourfirm.looplink.com/SearchResults`, which displays **your company's**
+listings.
 
-To switch to LoopLink:
+#### Configuring it (no rebuild needed)
 
-1. Sign up via LoopNet → Solutions → LoopLink for brokers and owners. It is
-   sales-led; you will not get self-serve credentials.
-2. They provision a host, e.g. `https://yourfirm.looplink.com/SearchResults`.
-3. `cp .env.example .env.local` and set `VITE_LOOPLINK_URL` to that host.
-4. Rebuild. `PropertyFinder` detects it and renders the widget.
+The URL is resolved at runtime, in this order:
 
-Caveats once enabled: the widget is an iframe, so its content is not indexed as
-your page's copy; it is third-party content, so disclose it in your privacy policy
-(and gate on consent for EU/UK visitors); and if you add a CSP you must allow the
-vendor host in `frame-src`. The embed is scroll-gated with reserved height so it
-does not hurt CLS.
+| 1 | `?looplink=<url>` on any page URL | instant test, works in production |
+| 2 | `<meta name="looplink-url" content="…">` in `index.html` | set once, change post-deploy |
+| 3 | `VITE_LOOPLINK_URL` in `.env.local` | build-time default |
+
+So to try a URL right now — dev or deployed — just append it:
+
+```
+https://your-domain.com/?looplink=https://yourfirm.looplink.com/SearchResults#properties
+```
+
+Paste that and you will see either the widget or a **LoopLink setup check** panel
+in the bottom-right. The panel reports the resolved URL, whether the frame
+painted, your `origin`, and a `curl` that prints the response headers. Remove
+`?looplink=` to hide it. Once CoStar confirms the host, put it in the `<meta>`
+tag so it applies to every visitor.
+
+#### Expected first failure: framing is blocked
+
+LoopLink sends `X-Frame-Options` / `Content-Security-Policy: frame-ancestors` and
+only allows hosts registered in your account's **website allowlist**. An
+unregistered origin renders an empty box with _no_ error event, which is why the
+component probes after load and shows a notice rather than a blank rectangle.
+
+If the panel says `refused`, the fix is on CoStar's side: give them the exact
+`origin` the panel prints (e.g. `https://powerwashingoahu.com`, and any preview
+domain you test from) and ask them to add it to the allowlist. The `curl`
+command reveals the header they need to change.
+
+#### Other things to check with them
+
+- **Which domain is registered?** `www` vs apex are different origins.
+- **Is a SSL/HTTPS URL available?** A plain `http://` host will be blocked as
+  mixed content on an HTTPS page.
+- **Does the account have listings?** The widget renders _your_ availabilities;
+  with none it will look empty even when framing works.
+- **Any per-domain or traffic limits** in the agreement.
+
+Privacy note: an iframe is third-party content. Disclose it in your privacy
+policy and gate it behind consent if you target EU/UK. It is also not indexed as
+your page's markup, so it adds nothing to SEO. The frame is scroll-gated with
+reserved height (no CLS cost) and sandboxed to what a search UI needs.
 
 ### The local dataset
 

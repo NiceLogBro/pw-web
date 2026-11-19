@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowUpRight, Building2, MapPin, Search, Store } from "lucide-react";
 import {
   PROPERTY_TYPES,
@@ -10,7 +10,8 @@ import {
 } from "@/data/properties";
 import { cn } from "@/utils/cn";
 import { Reveal, SectionHeader } from "@/components/ui";
-import LoopLinkEmbed, { hasLoopLink } from "@/components/LoopLinkEmbed";
+import LoopLinkEmbed, { resolveLoopLinkUrl } from "@/components/LoopLinkEmbed";
+import LoopLinkDiagnostics from "@/components/LoopLinkDiagnostics";
 
 const PAGE_SIZE = 9;
 
@@ -19,6 +20,20 @@ const typeLabel = (id: PropertyType) =>
 
 export default function PropertyFinder() {
   const [query, setQuery] = useState("");
+  // Resolved at runtime so ?looplink= and the <meta> tag work without a rebuild.
+  const [loopLinkUrl, setLoopLinkUrl] = useState<string | null>(null);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+
+  useEffect(() => {
+    const metaUrl = document.querySelector<HTMLMetaElement>('meta[name="looplink-url"]')?.content;
+    const resolved = resolveLoopLinkUrl(
+      window.location.href,
+      metaUrl || undefined,
+      import.meta.env.VITE_LOOPLINK_URL as string | undefined,
+    );
+    setLoopLinkUrl(resolved);
+    setShowDiagnostics(new URL(window.location.href).searchParams.has("looplink"));
+  }, []);
   const [type, setType] = useState<PropertyType | "all">("all");
   const [visible, setVisible] = useState(PAGE_SIZE);
 
@@ -45,7 +60,7 @@ export default function PropertyFinder() {
 
         {/* Once a LoopLink host is configured, the licensed widget replaces the
             local OSM-backed finder (see LoopLinkEmbed). */}
-        {hasLoopLink ? (
+        {loopLinkUrl ? (
           <Reveal className="mt-10">
             <LoopLinkEmbed />
           </Reveal>
@@ -185,6 +200,8 @@ export default function PropertyFinder() {
             </p>
           </>
         )}
+
+        {loopLinkUrl && showDiagnostics && <LoopLinkDiagnostics url={loopLinkUrl} />}
       </div>
     </section>
   );

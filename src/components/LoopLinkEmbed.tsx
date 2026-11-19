@@ -4,41 +4,87 @@ import { ExternalLink } from "lucide-react";
 /**
  * LoopLink (CoStar/LoopNet) property-search embed.
  *
- * LoopLink is not an API — there is no LoopNet/CoStar public API, and their terms
- * prohibit programmatic access. The only sanctioned integration is their hosted
- * search widget, which you get after signing up; it is provisioned on a host they
- * give you and displays YOUR company's listings.
+ * WHAT THIS IS FOR
+ * LoopLink is a hosted search widget, not an API — there is no LoopNet/CoStar
+ * public API and their terms prohibit programmatic access. Once CoStar gives you
+ * access they provision a host (usually https://<yourcompany>.looplink.com/...)
+ * which displays YOUR company's listings.
  *
- * So this component is a thin, safe wrapper around that iframe. Until a host is
- * configured it renders nothing, and `PropertyFinder` shows the local dataset.
+ * THE URL IS RESOLVED AT RUNTIME, NOT BUILD TIME
+ * `VITE_LOOPLINK_URL` is inlined by Vite at build time, so testing a URL would
+ * otherwise require a rebuild — and the URL only exists while a visitor is on the
+ * page. Resolution order:
  *
- * Setup:
- *   1. Sign up for LoopLink (LoopNet → Solutions → LoopLink for brokers/owners).
- *   2. They provision a URL, e.g. https://yourfirm.looplink.com/SearchResults
- *   3. Put it in `.env.local`:
- *        VITE_LOOPLINK_URL=https://yourfirm.looplink.com/SearchResults
- *   4. LoopLinkEmbed replaces the local finder automatically (see PropertyFinder).
+ *   1. `?looplink=<url>` in the page URL — lets you paste a candidate URL and see
+ *      it immediately, in dev or in production, with no rebuild.
+ *   2. `<meta name="looplink-url" content="https://...">` in index.html — lets you
+ *      change the host post-deploy, no rebuild. Pick this once CoStar confirms.
+ *   3. `VITE_LOOPLINK_URL` from `.env.local` — build-time default.
  *
- * Notes:
- * - The iframe is gated on scroll and reserves height, so it doesn't wreck CLS.
- * - No cookies are set by us; the vendor iframe is third-party content — disclose
- *   it in your privacy policy and gate it behind consent if you target EU/UK.
- * - If you add a CSP, allow the vendor host in `frame-src`.
+ * THE EMBED WILL PROBABLY BE BLOCKED AT FIRST (and that is expected)
+ * LoopLink serves framing headers (X-Frame-Options / CSP frame-ancestors) and only
+ * allows hosts registered in your account's website whitelist. An unregistered
+ * origin renders an empty box with no error event, so this component runs a probe
+ * after load and shows a setup notice instead of a silent blank rectangle.
+ *
+ * Also note: an iframe is third-party content — it is not indexed as your page's
+ * markup (so it adds nothing to SEO), and it is subject to your consent policy.
+ * The frame is scroll-gated with reserved height so it does not cost CLS, and it
+ * has `sandbox` set: LoopLink search needs scripts, forms, same-origin storage and
+ * its own navigations, and nothing more.
  */
 
-const LOOPLINK_URL = import.meta.env.VITE_LOOPLINK_URL as string | undefined;
+const META_SELECTOR = 'meta[name="looplink-url"]';
+const FALLBACK_HEIGHT = 820;
 
-export const hasLoopLink = Boolean(LOOPLINK_URL);
+/** Validates and normalises a candidate embed URL. Returns null if unusable. */
+export function resolveLoopLinkUrl(pageUrl: string, metaUrl?: string, envUrl?: string) {
+  const candidates = [new URL(pageUrl).searchParams.get("looplink"), metaUrl, envUrl].filter(
+    (value): value is string => Boolean(value && value.trim()),
+  );
+
+  for (const candidate of candidates) {
+    try {
+      const url = new URL(candidate);
+      if (url.protocol !== "https:" && url.protocol !== "http:") continue;
+      return url.toString();
+    } catch {
+      // Ignore malformed values and fall through to the next candidate.
+    }
+  }
+
+  return null;
+}
+
+function readMetaUrl() {
+  if (typeof document === "undefined") return undefined;
+  return document.querySelector<HTMLMetaElement>(META_SELECTOR)?.content || undefined;
+}
 
 export default function LoopLinkEmbed() {
+  const [url, setUrl] = useState<string | null>(null);
   const [active, setActive] = useState(false);
+  const [height, setHeight] = useState(FALLBACK_HEIGHT);
+  const [blocked, setBlocked] = useState(false);
+  const frameRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Resolve the URL on the client so ?looplink= and the meta tag work without a rebuild.
+  useEffect(() => {
+    setUrl(
+      resolveLoopLinkUrl(
+        window.location.href,
+        readMetaUrl(),
+        import.meta.env.VITE_LOOPLINK_URL as string | undefined,
+      ),
+    );
+  }, []);
+
+  // Only mount the iframe once the section is near the viewport.
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return;
 
-    // Don't pay third-party load cost until the section is near the viewport.
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -53,25 +99,61 @@ export default function LoopLinkEmbed() {
     return () => observer.disconnect();
   }, []);
 
-  if (!LOOPLINK_URL) return null;
+  // A framed LoopLink page can usually still be probed same-origin-ish; if the
+  // browser refused the frame, onload never fires and we time out. Either way the
+  // visitor gets an explanation and a way through rather than a blank box.
+  useEffect(() => {
+    if (!active || !url) return;
+    const timer = window.setTimeout(() => {
+      const frame = frameRef.current;
+      if (!frame) return;
+
+      try {
+        // Cross-origin reads throw — which means the frame did load.
+        const doc = frame.contentDocument;
+        if (doc && doc.body && doc.body.childElementCount === 0) setBlocked(true);
+      } catch {
+        // Loaded and cross-origin: this is the healthy path.
+      }
+    }, 6000);
+
+    return () => window.clearTimeout(timer);
+  }, [active, url]);
+
+  if (!url) return null;
 
   return (
     <div ref={containerRef} className="overflow-hidden rounded-3xl border border-white/10">
-      {/* Reserved height prevents layout shift when the iframe paints. */}
-      <div className="min-h-[820px] bg-abyss/60">
+      <div className="min-h-[820px] bg-abyss/60" style={{ minHeight: FALLBACK_HEIGHT }}>
         {active ? (
           <iframe
-            src={LOOPLINK_URL}
+            ref={frameRef}
+            src={url}
             title="Search available commercial properties"
             loading="lazy"
-            className="h-[820px] w-full border-0"
+            height={height}
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation"
             referrerPolicy="strict-origin-when-cross-origin"
+            onLoad={(event) => {
+              const frame = event.currentTarget;
+              try {
+                // Same-origin: measure the real document so we can size to it.
+                const doc = frame.contentDocument;
+                if (doc?.documentElement) {
+                  const next = doc.documentElement.scrollHeight;
+                  if (next > 400) setHeight(next);
+                }
+              } catch {
+                // Cross-origin: keep the fallback height.
+              }
+            }}
+            className="w-full border-0"
           />
         ) : (
           <div className="flex h-[820px] flex-col items-center justify-center gap-2 text-sm text-white/40">
             <span>Loading property search…</span>
             <a
-              href={LOOPLINK_URL}
+              href={url}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-spray hover:text-foam"
@@ -81,6 +163,25 @@ export default function LoopLinkEmbed() {
           </div>
         )}
       </div>
+
+      {blocked && (
+        <div className="border-t border-white/10 bg-gold/10 px-5 py-4 text-xs leading-relaxed text-white/70">
+          <strong className="text-gold">This URL refused to be embedded.</strong> LoopLink only
+          allows hosts registered in your account&apos;s website whitelist and sends{" "}
+          <code className="text-white/50">X-Frame-Options</code>/
+          <code className="text-white/50">CSP frame-ancestors</code>. Ask CoStar to allowlist this
+          domain, or{" "}
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-spray"
+          >
+            open the search in a new tab
+          </a>
+          .
+        </div>
+      )}
     </div>
   );
 }
