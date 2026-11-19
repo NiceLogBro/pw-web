@@ -74,6 +74,7 @@ export default function Footer() {
                 ["#head-to-head", "Head-to-Head"],
                 ["#why", "Why #1"],
                 ["#results", "Project Photos"],
+                ["#properties", "Commercial Properties"],
                 ["#reviews", "Reviews"],
                 ["#faq", "FAQ"],
               ].map(([href, label]) => (

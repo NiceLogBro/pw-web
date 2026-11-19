@@ -8,6 +8,7 @@ const links = [
   { href: "#head-to-head", label: "Head-to-Head" },
   { href: "#why", label: "Why #1" },
   { href: "#results", label: "Photos" },
+  { href: "#properties", label: "Properties" },
   { href: "#reviews", label: "Reviews" },
   { href: "#faq", label: "FAQ" },
 ];

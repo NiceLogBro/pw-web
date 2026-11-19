@@ -84,6 +84,49 @@ it produced a 3.7 MB HTML document with no lazy loading and no image caching.
 re-inlines every image and stylesheet, so the whole document must download before
 first paint. CI asserts the default build stays small.
 
+## Commercial property finder
+
+The **Properties** section lists commercial buildings on O'ahu with search and a
+property-type filter. Two data paths, in this order:
+
+1. **`VITE_LOOPLINK_URL` set** → `LoopLinkEmbed` renders the licensed
+   CoStar/LoopNet widget instead of the local list.
+2. **Otherwise** → the local dataset from `src/data/properties.ts`.
+
+### About LoopLink
+
+LoopLink is a hosted, paid widget from CoStar/LoopNet. **It is not an API**:
+there is no public LoopNet/CoStar API, no developer portal, and no webhooks, and
+CoStar's terms of service prohibit automated or programmatic access (which it has
+actively litigated). So there is nothing to `npm install` and nothing to scrape.
+
+To switch to LoopLink:
+
+1. Sign up via LoopNet → Solutions → LoopLink for brokers and owners. It is
+   sales-led; you will not get self-serve credentials.
+2. They provision a host, e.g. `https://yourfirm.looplink.com/SearchResults`.
+3. `cp .env.example .env.local` and set `VITE_LOOPLINK_URL` to that host.
+4. Rebuild. `PropertyFinder` detects it and renders the widget.
+
+Caveats once enabled: the widget is an iframe, so its content is not indexed as
+your page's copy; it is third-party content, so disclose it in your privacy policy
+(and gate on consent for EU/UK visitors); and if you add a CSP you must allow the
+vendor host in `frame-src`. The embed is scroll-gated with reserved height so it
+does not hurt CLS.
+
+### The local dataset
+
+`npm run properties` queries the Overpass API for commercial/retail/office/
+industrial/hotel buildings on O'ahu and writes geocoded records
+(`lat`/`lng`, address when tagged, nearest neighborhood). Data is
+**© OpenStreetMap contributors, ODbL 1.0** — keep the attribution that
+`PropertyFinder` renders.
+
+Until the script is run, `SEED_LISTINGS` provides 20 real O'ahu commercial
+property _names_ with **no addresses or coordinates** (those are never invented).
+The finder labels this state in the UI. No map library or tile server is used —
+"View on map" is a Google Maps deep link.
+
 ## Accessibility & motion
 
 - `.reveal` animations only hide content when scripting is enabled
@@ -93,11 +136,13 @@ first paint. CI asserts the default build stays small.
 - The FAQ uses `aria-controls` + `inert` so collapsed answers leave the
   accessibility tree.
 - There is a skip link, and each nav landmark has a distinct accessible name.
+- The property finder announces result counts via `aria-live` and every input has
+  a real `<label>`.
 
 ## Deployment
 
-The build is fully static. Publish `dist/` to any static host; `public/robots.txt`
-and `public/sitemap.xml` are copied through. If the production URL changes, update
+The build is fully static. Publish `dist/` to any static host; `public/robots.txt`,
+`public/sitemap.xml` and any configured LoopLink embed are copied through. If the production URL changes, update
 the canonical/OG URLs in `index.html`, `StructuredData.tsx`, and `public/sitemap.xml`.
 
 ## Editorial disclosure

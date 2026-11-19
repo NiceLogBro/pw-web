@@ -8,6 +8,7 @@ import WhyToolGuys from "@/components/WhyToolGuys";
 import ProjectResults from "@/components/ProjectResults";
 import Services from "@/components/Services";
 import Testimonials from "@/components/Testimonials";
+import PropertyFinder from "@/components/PropertyFinder";
 import Neighborhoods from "@/components/Neighborhoods";
 import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
@@ -36,6 +37,7 @@ export default function App() {
           <HeadToHead />
           <WhyToolGuys />
           <ProjectResults />
+          <PropertyFinder />
           <Services />
           <Testimonials />
           <Neighborhoods />
