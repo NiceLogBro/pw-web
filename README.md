@@ -143,6 +143,44 @@ command reveals the header they need to change.
   with none it will look empty even when framing works.
 - **Any per-domain or traffic limits** in the agreement.
 
+#### Analytics and lead attribution (there is no affiliate program)
+
+LoopNet/CoStar has **no affiliate or referral program** and pays no commission; the
+only identifier they hand you is the embed itself. So what this repo measures is
+_lead attribution_ — which outbound destination a visitor reached:
+
+| Event             | Fires when                       | Params                                  |
+| ----------------- | -------------------------------- | --------------------------------------- |
+| `looplink_view`   | the embed is mounted in viewport | `url`                                   |
+| `looplink_event`  | the widget posts an interaction  | `widget_event`                          |
+| `outbound_click`  | any external link is clicked     | `link_domain`, `link_label`, `link_url` |
+| `quote_click`     | phone/email CTA is clicked       | `channel`, `label`                      |
+| `property_search` | reserved for finder queries      | —                                       |
+
+Delivery (`src/utils/analytics.ts`): fires GA4 `gtag` if the property owner has
+installed it, and **always** dispatches a DOM `site:analytics` CustomEvent, so GTM,
+Plausible or any other tool can subscribe without touching call sites:
+
+```js
+window.addEventListener("site:analytics", (e) => console.log(e.detail));
+```
+
+Outbound links use `OutboundLink` (`src/components/OutboundLink.tsx`), which renders
+a plain `<a>` — no behaviour or a11y change, just instrumentation.
+
+If you ever agree a referral/lead-gen deal with the broker, `outbound_click` and
+`quote_click` counts are the numbers it would be settled on. Any `?ref=` code you
+append to `powerwashingoahu.com` is **yours**, not a CoStar-issued affiliate code.
+
+#### Listening to the widget
+
+LoopLink's install code is the iframe plus a small script that posts messages to
+the parent — content height (`PAGE_HEIGHT_CHANGE`) and interaction events. Both are
+handled in `LoopLinkEmbed` and **origin-checked**: only messages whose origin matches
+the embedded URL are trusted, never `"*"` (a permissive listener would let any framed
+origin resize your page and forge analytics). `readIframeHeight` also clamps to
+400–20000px.
+
 Privacy note: an iframe is third-party content. Disclose it in your privacy
 policy and gate it behind consent if you target EU/UK. It is also not indexed as
 your page's markup, so it adds nothing to SEO. The frame is scroll-gated with

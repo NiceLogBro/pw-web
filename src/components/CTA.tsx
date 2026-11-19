@@ -1,5 +1,6 @@
 import { ExternalLink, Mail, Phone } from "lucide-react";
 import { Photo, Reveal } from "@/components/ui";
+import OutboundLink from "@/components/OutboundLink";
 import { photos } from "@/assets/photos";
 
 export default function CTA() {
@@ -29,26 +30,29 @@ export default function CTA() {
               reclamation. The #1 crew on PowerWashingOahu.com is one call away.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a
+              <OutboundLink
                 href="tel:+18089276202"
+                label="cta_phone"
                 className="inline-flex items-center gap-2 rounded-full bg-spray px-6 py-3.5 text-sm font-extrabold text-abyss shadow-xl shadow-spray/30 transition hover:bg-foam"
               >
                 <Phone className="h-4 w-4" /> (808) 927-6202
-              </a>
-              <a
+              </OutboundLink>
+              <OutboundLink
                 href="https://powerwashingoahu.com"
+                label="cta_website"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-foam px-6 py-3.5 text-sm font-extrabold text-abyss transition hover:bg-white"
               >
                 PowerWashingOahu.com <ExternalLink className="h-4 w-4" />
-              </a>
-              <a
+              </OutboundLink>
+              <OutboundLink
                 href="mailto:powerwashingoahu@gmail.com"
+                label="cta_email"
                 className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3.5 text-sm font-semibold text-foam transition hover:border-spray hover:text-spray"
               >
                 <Mail className="h-4 w-4" /> powerwashingoahu@gmail.com
-              </a>
+              </OutboundLink>
             </div>
           </div>
         </div>

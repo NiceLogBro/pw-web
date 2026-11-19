@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink } from "lucide-react";
+import { isTrustedOrigin, readIframeHeight, track, trackOutbound } from "@/utils/analytics";
 
 /**
  * LoopLink (CoStar/LoopNet) property-search embed.
@@ -26,6 +27,18 @@ import { ExternalLink } from "lucide-react";
  * allows hosts registered in your account's website whitelist. An unregistered
  * origin renders an empty box with no error event, so this component runs a probe
  * after load and shows a setup notice instead of a silent blank rectangle.
+ *
+ * LISTENING TO THE WIDGET
+ * The LoopLink install code is the iframe plus, on this class of product, a small
+ * script that (a) posts its content height to the parent so the frame can be sized
+ * without a double scrollbar, and (b) forwards interactions so they can be measured.
+ * Both arrive as postMessage, and both are origin-checked here: only messages whose
+ * origin matches the embedded URL are trusted, never "*".
+ *
+ * Note this is NOT an affiliate program. LoopNet/CoStar pays no commission and
+ * issues no referral links; the only identifier they give you is the embed itself.
+ * What is measurable — and what a broker/referral agreement would be settled on —
+ * is lead attribution, which is why outbound clicks are tracked.
  *
  * Also note: an iframe is third-party content — it is not indexed as your page's
  * markup (so it adds nothing to SEO), and it is subject to your consent policy.
@@ -120,10 +133,38 @@ export default function LoopLinkEmbed() {
     return () => window.clearTimeout(timer);
   }, [active, url]);
 
+  // Trust only the embedded origin. Height sync + interaction forwarding.
+  useEffect(() => {
+    if (!active || !url) return;
+
+    const onMessage = (event: MessageEvent) => {
+      if (!isTrustedOrigin(event.origin, url)) return;
+
+      const nextHeight = readIframeHeight(event.data);
+      if (nextHeight !== null) {
+        setHeight(nextHeight);
+        return;
+      }
+
+      // Forward anything else the widget reports (filters used, listing opened)
+      // as a single event so the payload stays inspectable in GA4.
+      const payload = event.data as { type?: string } | null;
+      if (payload && typeof payload.type === "string") {
+        track("looplink_event", { widget_event: payload.type });
+      }
+    };
+
+    window.addEventListener("message", onMessage);
+    track("looplink_view", { url });
+
+    return () => window.removeEventListener("message", onMessage);
+  }, [active, url]);
+
   if (!url) return null;
 
   return (
     <div ref={containerRef} className="overflow-hidden rounded-3xl border border-white/10">
+      {/* min-height reserves room so the frame cannot cause layout shift. */}
       <div className="min-h-[820px] bg-abyss/60" style={{ minHeight: FALLBACK_HEIGHT }}>
         {active ? (
           <iframe
@@ -175,6 +216,7 @@ export default function LoopLinkEmbed() {
             href={url}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackOutbound(url, "looplink_blocked")}
             className="underline underline-offset-2 hover:text-spray"
           >
             open the search in a new tab

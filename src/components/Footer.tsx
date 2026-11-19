@@ -1,5 +1,6 @@
 import { Droplets } from "lucide-react";
 import { photoGalleryUrl } from "@/assets/photos";
+import OutboundLink from "@/components/OutboundLink";
 
 export default function Footer() {
   return (
@@ -41,14 +42,15 @@ export default function Footer() {
             <ul className="mt-4 space-y-2 text-sm text-white/60">
               <li>
                 <span className="font-bold text-gold">#1</span>{" "}
-                <a
+                <OutboundLink
                   href="https://powerwashingoahu.com"
+                  label="footer_website"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline-offset-2 hover:text-spray hover:underline"
                 >
                   Tool Guys – Power Washing
-                </a>
+                </OutboundLink>
               </li>
               <li>
                 <span className="font-bold text-white/70">#2</span> Paradise Pressure Washing LLC

@@ -1,5 +1,6 @@
 import { ArrowDown, Award, ExternalLink, Gauge, MapPin, Star } from "lucide-react";
 import { CountUp, Photo, Stars } from "@/components/ui";
+import OutboundLink from "@/components/OutboundLink";
 import { photos } from "@/assets/photos";
 
 const droplets = [
@@ -113,14 +114,15 @@ export default function Hero() {
               <span className="text-sm text-white/60">locally owned since 2020 · island-wide</span>
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
-              <a
+              <OutboundLink
                 href="https://powerwashingoahu.com"
+                label="hero_website"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-spray px-5 py-2.5 text-sm font-bold text-abyss shadow-lg shadow-spray/30 transition hover:bg-foam"
               >
                 Visit PowerWashingOahu.com <ExternalLink className="h-4 w-4" />
-              </a>
+              </OutboundLink>
               <a
                 href="#rankings"
                 className="inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-semibold text-foam transition hover:border-spray hover:text-spray"

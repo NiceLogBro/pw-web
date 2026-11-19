@@ -9,6 +9,7 @@ import {
   type PropertyType,
 } from "@/data/properties";
 import { cn } from "@/utils/cn";
+import OutboundLink from "@/components/OutboundLink";
 import { Reveal, SectionHeader } from "@/components/ui";
 import LoopLinkEmbed, { resolveLoopLinkUrl } from "@/components/LoopLinkEmbed";
 import LoopLinkDiagnostics from "@/components/LoopLinkDiagnostics";
@@ -151,12 +152,13 @@ export default function PropertyFinder() {
                       ) : (
                         <span className="text-xs text-white/30">Location on request</span>
                       )}
-                      <a
+                      <OutboundLink
                         href="tel:+18089276202"
+                        label={`property_quote_${item.area}`}
                         className="rounded-full bg-white/5 px-3 py-1.5 text-xs font-bold text-foam ring-1 ring-white/10 transition hover:bg-white/10"
                       >
                         Get a quote
-                      </a>
+                      </OutboundLink>
                     </div>
                   </article>
                 );
