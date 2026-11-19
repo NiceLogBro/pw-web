@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Types were previously stripped by Vite and never checked.
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+      - run: npm run build
+
+      # Guard the thing that regressed before: the entry HTML must stay small and
+      # images must remain separate, cacheable assets.
+      - name: Assert assets are not inlined
+        run: |
+          size=$(stat -c%s dist/index.html)
+          echo "dist/index.html = $size bytes"
+          test "$size" -lt 200000
+          test -d dist/assets
+          ls dist/assets/*.webp | head -1

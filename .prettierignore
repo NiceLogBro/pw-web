@@ -1,0 +1,5 @@
+dist/
+node_modules/
+package-lock.json
+# Generated from scripts/optimize-photos.mjs
+src/assets/photos.ts
