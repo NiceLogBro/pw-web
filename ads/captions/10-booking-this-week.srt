@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:04,690
+Booking
+This Week
+
+2
+00:00:04,690 --> 00:00:08,190
+West Side
+Filling Up
+
+3
+00:00:08,190 --> 00:00:11,130
+Call Before
+It'S Gone
+
+4
+00:00:11,130 --> 00:00:14,000
+Get On The
+Schedule
